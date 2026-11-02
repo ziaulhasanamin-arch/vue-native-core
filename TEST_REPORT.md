@@ -14,7 +14,7 @@ Environment: Debian 12 sandbox, Node 22.22.3, npm 10.9.8. Browser tests use bund
 | `npm audit --omit=dev` | ✅ PASS | 0 vulnerabilities (info/low/moderate/high/critical). |
 | `./gradlew :app:assembleDebug` — GitHub Actions | ✅ PASS | Ubuntu 24.04, Temurin JDK 21, Android SDK 35, Gradle 8.11.1; native build completed in 3m47s. |
 | APK signature / package / alignment / checksum | ✅ PASS | `apksigner verify` passed (v1+v2); package/version confirmed with `aapt`; `zipalign -c` and SHA-256 checks passed. |
-| Native install/launch | ❌ NOT RUN | APK is available; no physical device/emulator launch test has been performed. |
+| Native install/launch — Android 15 emulator | ✅ PASS | APK installed, cold launch succeeded, WebView reached `/#/welcome`, onboarding heading rendered, process alive; ADB + CDP screenshots captured. Physical device not tested. |
 | Live Supabase auth/sync/realtime | ❌ NOT RUN | No project credentials configured. |
 | Firebase push / Android 13 permission | ❌ NOT RUN | No Firebase project/device. |
 | Biometric / SecureStorage / camera / local notifications | ❌ NOT RUN | Requires native device/emulator. |
@@ -63,8 +63,9 @@ Environment: Debian 12 sandbox, Node 22.22.3, npm 10.9.8. Browser tests use bund
 - Path: `dist/TakaGeloKoi-debug.apk`
 - Package ID: `com.takagelokoi.finance`
 - Version: `1.0.0` / versionCode `1`
-- Size: **30,747,135 bytes** (30.75 MB / 29.32 MiB)
+- Size: **32,207,873 bytes** (32.21 MB / 30.72 MiB)
 - Minimum Android: API 23 (Android 6.0); target/compile SDK: 35
 - SHA-256: see `dist/TakaGeloKoi-debug.apk.sha256`
 - Signing: Android debug certificate; APK Signature Scheme v1 and v2 verified
-- Verification: native Gradle build, web build, Capacitor sync, unit tests, signature, package metadata, alignment and checksum pass. Physical-device installation/launch remains unverified.
+- Verification: native Gradle build, web build, Capacitor sync, 22 unit tests, signature, package metadata, alignment, checksum, and Android 15 emulator install/launch pass. Physical-device installation/launch remains unverified.
+- First-launch regression fix: Android SQLite schema initialization no longer sends DDL through `executeSet`; explicit native transactions use `execute` for DDL and `run` for bound DML. Evidence: `android-device-results/report.json`, `webview.png`.
