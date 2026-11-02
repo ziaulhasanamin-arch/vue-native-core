@@ -1,0 +1,48 @@
+{
+  "package": "com.takagelokoi.finance",
+  "startedAt": "2026-11-02T17:27:32.338Z",
+  "steps": [
+    {
+      "name": "device",
+      "detail": "15 / API 35",
+      "at": "2026-11-02T17:27:32.455Z"
+    },
+    {
+      "name": "install",
+      "detail": "APK installed successfully",
+      "at": "2026-11-02T17:27:36.828Z"
+    },
+    {
+      "name": "launch",
+      "detail": "Starting: Intent { cmp=com.takagelokoi.finance/.MainActivity }\nStatus: ok\nLaunchState: COLD\nActivity: com.takagelokoi.finance/.MainActivity\nTotalTime: 3921\nWaitTime: 3935\nComplete",
+      "at": "2026-11-02T17:27:41.283Z"
+    },
+    {
+      "name": "webview-socket",
+      "detail": "webview_devtools_remote_2050",
+      "at": "2026-11-02T17:27:41.377Z"
+    },
+    {
+      "name": "result",
+      "detail": "App reached a usable screen on the Android emulator",
+      "at": "2026-11-02T17:27:58.239Z"
+    }
+  ],
+  "pass": true,
+  "webview": {
+    "url": "https://localhost/#/welcome",
+    "title": "TakaGeloKoi — Your money, beautifully managed",
+    "heading": "Take control of your finances",
+    "loading": false,
+    "onboarding": true,
+    "shell": false,
+    "body": "TakaGeloKoi\nYOUR MONEY, BEAUTIFULLY MANAGED.\nA FRESH START FOR YOUR FINANCES\nLess money stress.\nMore life.\n\nTrack, save, and grow — all in one place.\n\nAll your data stays on this device.\nCash · Bank · bKash · Nagad\nMEET TAKAGELOKOI\nTake control of your finances\n\nTrack, save, and grow — all in one place.\n\nEvery account, in one place\nOffline-first. Private by default.\nSmall steps. Meaningful progress.\nGet started\nNo ads. No pressure. Just a clearer picture.\n1 / 4\n© 2026 TakaGeloKoi\nPrivacy policy",
+    "viewport": {
+      "width": 412,
+      "height": 915
+    },
+    "userAgent": "Mozilla/5.0 (Linux; Android 15; sdk_gphone64_x86_64 Build/AE3A.240806.043; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/124.0.6367.219 Mobile Safari/537.36"
+  },
+  "processAlive": true,
+  "finishedAt": "2026-11-02T17:27:58.240Z"
+}
