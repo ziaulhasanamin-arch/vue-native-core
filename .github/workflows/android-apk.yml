@@ -188,7 +188,7 @@ jobs:
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add -f android-device-results/report.json android-device-results/relevant-logcat.txt android-device-results/screenshot.png || true
+          git add -f android-device-results/report.json android-device-results/relevant-logcat.txt android-device-results/screenshot.png android-device-results/webview.png || true
           if ! git diff --cached --quiet; then
             git commit -m "Record Android emulator launch evidence (run $RUN_ID)"
             git push origin "HEAD:$TARGET_BRANCH"

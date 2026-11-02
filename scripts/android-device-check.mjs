@@ -35,6 +35,28 @@ async function cdpEvaluate(expression) {
   } finally { ws.close(); }
 }
 
+async function cdpScreenshot() {
+  const list = await (await fetch('http://127.0.0.1:9222/json/list', { signal: AbortSignal.timeout(5000) })).json();
+  const page = list.find(target => target.type === 'page' && target.webSocketDebuggerUrl);
+  if (!page) throw new Error('No inspectable WebView page found');
+  const ws = new WebSocket(page.webSocketDebuggerUrl);
+  await new Promise((resolve, reject) => { ws.addEventListener('open', resolve, { once: true }); ws.addEventListener('error', reject, { once: true }); });
+  try {
+    const result = await new Promise((resolve, reject) => {
+      const timer = setTimeout(() => reject(new Error('CDP screenshot timed out')), 15000);
+      ws.addEventListener('message', event => {
+        const message = JSON.parse(event.data);
+        if (message.id !== 2) return;
+        clearTimeout(timer);
+        if (message.error) reject(new Error(message.error.message));
+        else resolve(message.result);
+      });
+      ws.send(JSON.stringify({ id: 2, method: 'Page.captureScreenshot', params: { format: 'png', captureBeyondViewport: false } }));
+    });
+    return result.data;
+  } finally { ws.close(); }
+}
+
 try {
   step('device', adb('shell', 'getprop', 'ro.build.version.release') + ' / API ' + adb('shell', 'getprop', 'ro.build.version.sdk'));
   adb('install', '-r', '-g', apk);
@@ -75,6 +97,12 @@ try {
     if (!state.loading && (state.onboarding || state.shell)) break;
   }
   report.webview = state;
+  await sleep(1500);
+  try {
+    const png = await cdpScreenshot();
+    writeFileSync(path.join(out, 'webview.png'), Buffer.from(png, 'base64'));
+    step('webview-screenshot', 'Captured rendered WebView pixels through Chrome DevTools Protocol');
+  } catch (error) { step('webview-screenshot', error.message); }
   writeFileSync(path.join(out, 'screenshot.png'), execFileSync('adb', ['exec-out', 'screencap', '-p'], { maxBuffer: 16 * 1024 * 1024 }));
   const logcat = execFileSync('adb', ['logcat', '-d', '-v', 'threadtime'], { encoding: 'utf8', maxBuffer: 32 * 1024 * 1024 });
   writeFileSync(path.join(out, 'logcat.txt'), logcat);
