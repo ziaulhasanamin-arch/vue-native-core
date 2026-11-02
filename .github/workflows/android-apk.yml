@@ -46,8 +46,6 @@ jobs:
 
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
-        with:
-          cache-provider: basic
 
       # Keep the ordinary Android debug identity between CI builds when the cache survives.
       # This is a development APK, not a Play Store release signing key.
@@ -131,3 +129,50 @@ jobs:
             android/build/reports/**
           if-no-files-found: ignore
           retention-days: 7
+
+  device-smoke:
+    name: Install and launch on Android emulator
+    needs: debug-apk
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - name: Check out device test script
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Download built APK
+        uses: actions/download-artifact@v4
+        with:
+          name: TakaGeloKoi-debug-APK
+          path: ci-apk
+
+      - name: Enable KVM for the emulator
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+
+      - name: Boot Android, install APK and verify the first screen
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 35
+          target: google_apis
+          arch: x86_64
+          profile: pixel_6
+          disable-animations: true
+          emulator-boot-timeout: 900
+          emulator-options: -no-window -no-audio -no-boot-anim -no-snapshot -gpu swiftshader_indirect -camera-back none -camera-front none
+          script: node scripts/android-device-check.mjs ci-apk/TakaGeloKoi-debug.apk
+
+      - name: Upload emulator evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: Android-emulator-evidence
+          path: android-device-results/**
+          if-no-files-found: warn
+          retention-days: 14
