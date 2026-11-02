@@ -1,0 +1,133 @@
+name: Build TakaGeloKoi Android APK
+
+on:
+  push:
+    branches: [arena/85cba16c-vue-native-core]
+    paths-ignore:
+      - 'dist/**'
+      - '*.md'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: takagelokoi-apk-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  debug-apk:
+    name: Build and verify installable debug APK
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - name: Check out application
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Set up Java 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+        with:
+          packages: 'platform-tools platforms;android-35 build-tools;35.0.0'
+          log-accepted-android-sdk-licenses: false
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          cache-provider: basic
+
+      # Keep the ordinary Android debug identity between CI builds when the cache survives.
+      # This is a development APK, not a Play Store release signing key.
+      - name: Preserve development signing identity
+        uses: actions/cache@v4
+        with:
+          path: ~/.android/debug.keystore
+          key: takagelokoi-debug-keystore-v1
+
+      - name: Install locked npm dependencies
+        run: npm ci --no-audit --no-fund
+
+      - name: Run financial and database unit tests
+        run: npm test
+
+      - name: Build web application and synchronize Capacitor
+        run: npm run cap:sync
+
+      - name: Build native Android debug APK
+        working-directory: android
+        run: |
+          chmod +x gradlew
+          ./gradlew :app:assembleDebug --no-daemon --stacktrace
+
+      - name: Verify APK package, version and signature
+        id: verify
+        run: |
+          mkdir -p dist
+          cp android/app/build/outputs/apk/debug/app-debug.apk dist/TakaGeloKoi-debug.apk
+          BUILD_TOOLS="$ANDROID_HOME/build-tools/35.0.0"
+          "$BUILD_TOOLS/apksigner" verify --verbose --print-certs dist/TakaGeloKoi-debug.apk | tee dist/TakaGeloKoi-debug-verification.txt
+          "$BUILD_TOOLS/aapt" dump badging dist/TakaGeloKoi-debug.apk | grep -E "^(package:|sdkVersion:|targetSdkVersion:|application-label:|launchable-activity:)" | tee -a dist/TakaGeloKoi-debug-verification.txt
+          "$BUILD_TOOLS/zipalign" -c -v 4 dist/TakaGeloKoi-debug.apk > dist/TakaGeloKoi-debug-alignment.txt
+          BYTES=$(stat -c%s dist/TakaGeloKoi-debug.apk)
+          SHA256=$(sha256sum dist/TakaGeloKoi-debug.apk | cut -d' ' -f1)
+          printf '%s  %s\n' "$SHA256" TakaGeloKoi-debug.apk > dist/TakaGeloKoi-debug.apk.sha256
+          echo "bytes=$BYTES" >> "$GITHUB_OUTPUT"
+          echo "sha256=$SHA256" >> "$GITHUB_OUTPUT"
+          {
+            echo '## TakaGeloKoi debug APK'
+            echo '- Package: `com.takagelokoi.finance`'
+            echo '- Version: `1.0.0` / versionCode `1`'
+            echo "- Size: $BYTES bytes"
+            echo "- SHA-256: \`$SHA256\`"
+            echo '- Signature and ZIP alignment: verified'
+            echo '- Native device installation: not performed by this build job'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload APK and verification reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: TakaGeloKoi-debug-APK
+          path: |
+            dist/TakaGeloKoi-debug.apk
+            dist/TakaGeloKoi-debug.apk.sha256
+            dist/TakaGeloKoi-debug-verification.txt
+            dist/TakaGeloKoi-debug-alignment.txt
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Save verified APK to the working branch for download
+        env:
+          TARGET_BRANCH: ${{ github.ref_name }}
+          RUN_ID: ${{ github.run_id }}
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -f dist/TakaGeloKoi-debug.apk dist/TakaGeloKoi-debug.apk.sha256 dist/TakaGeloKoi-debug-verification.txt dist/TakaGeloKoi-debug-alignment.txt
+          if ! git diff --cached --quiet; then
+            git commit -m "Build verified TakaGeloKoi debug APK (run $RUN_ID)"
+            git push origin "HEAD:$TARGET_BRANCH"
+          fi
+
+      - name: Upload native build diagnostics if failed
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: Android-build-diagnostics
+          path: |
+            android/app/build/reports/**
+            android/build/reports/**
+          if-no-files-found: ignore
+          retention-days: 7
