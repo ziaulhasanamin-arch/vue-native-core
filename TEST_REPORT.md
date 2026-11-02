@@ -12,8 +12,9 @@ Environment: Debian 12 sandbox, Node 22.22.3, npm 10.9.8. Browser tests use bund
 | `npm test` (Vitest) | ✅ PASS | 4 files, 20 tests: money, finance/ledger, schema/rollback, recurrence. |
 | `npm run test:e2e` (Playwright) | ✅ PASS | 3 tests: ledger/onboarding/persistence/offline; budgets/goals/debts/investments; mobile layout/theme. |
 | `npm audit --omit=dev` | ✅ PASS | 0 vulnerabilities (info/low/moderate/high/critical). |
-| `cd android && ./gradlew assembleDebug` | ❌ BLOCKED | Gradle wrapper cannot download `gradle-8.11.1-all.zip`: `SSLHandshakeException: Remote host terminated the handshake`. No APK produced. |
-| Native install/launch | ❌ NOT RUN | No adb/emulator/APK. |
+| `./gradlew :app:assembleDebug` — GitHub Actions | ✅ PASS | Ubuntu 24.04, Temurin JDK 21, Android SDK 35, Gradle 8.11.1; native build completed in 3m47s. |
+| APK signature / package / alignment / checksum | ✅ PASS | `apksigner verify` passed (v1+v2); package/version confirmed with `aapt`; `zipalign -c` and SHA-256 checks passed. |
+| Native install/launch | ❌ NOT RUN | APK is available; no physical device/emulator launch test has been performed. |
 | Live Supabase auth/sync/realtime | ❌ NOT RUN | No project credentials configured. |
 | Firebase push / Android 13 permission | ❌ NOT RUN | No Firebase project/device. |
 | Biometric / SecureStorage / camera / local notifications | ❌ NOT RUN | Requires native device/emulator. |
@@ -52,14 +53,18 @@ Environment: Debian 12 sandbox, Node 22.22.3, npm 10.9.8. Browser tests use bund
 - Cap sync log: `/home/user/capsync.log`
 - Vitest log: `/home/user/vitest.log`
 - E2E log: `/home/user/e2e.log`
-- Gradle failure log: `/home/user/gradle.log`
+- Successful native build: https://github.com/ziaulhasanamin-arch/vue-native-core/actions/runs/41448675187
+- Historical local Gradle blocker: `/home/user/gradle.log` (resolved by building on GitHub Actions)
 - Audit JSON: `/home/user/audit.json`
 - Mobile screenshots: `test-results/mobile-home.png`, `test-results/mobile-light.png`
 
 ## APK delivery
 
-- Path: **not produced**
+- Path: `dist/TakaGeloKoi-debug.apk`
 - Package ID: `com.takagelokoi.finance`
 - Version: `1.0.0` / versionCode `1`
-- Size: N/A
-- Verification: web build + Capacitor sync + browser/unit tests pass; native APK build/install/launch blocked by sandbox toolchain/network.
+- Size: **30,747,135 bytes** (30.75 MB / 29.32 MiB)
+- Minimum Android: API 23 (Android 6.0); target/compile SDK: 35
+- SHA-256: see `dist/TakaGeloKoi-debug.apk.sha256`
+- Signing: Android debug certificate; APK Signature Scheme v1 and v2 verified
+- Verification: native Gradle build, web build, Capacitor sync, unit tests, signature, package metadata, alignment and checksum pass. Physical-device installation/launch remains unverified.

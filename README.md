@@ -12,7 +12,7 @@ TakaGeloKoi is an offline-first personal finance application for Android, built 
 
 ## Status
 
-The application source, database layer, cloud schema, unit tests and browser E2E tests are implemented. The production web build and Capacitor Android sync pass. **A signed or debug APK could not be produced in this sandbox** because Gradle distribution downloads and Android/Maven dependencies are unavailable. See `TEST_REPORT.md` and `KNOWN_LIMITATIONS.md` for the exact verification boundary.
+The application source, database layer, cloud schema, unit tests and browser E2E tests are implemented. A **signed, installable debug APK is available at `dist/TakaGeloKoi-debug.apk`**. It was built by GitHub Actions with the full native Capacitor plugin set; its package, version, signature, checksum and ZIP alignment were verified. Native device installation/launch has not yet been performed. See `TEST_REPORT.md` and `KNOWN_LIMITATIONS.md` for the verification boundary.
 
 ## Quick start (browser)
 
@@ -32,7 +32,7 @@ npm run preview
 
 ## Android build
 
-Requirements: JDK 17+, Android SDK 34/35, Gradle 8.11.1 wrapper, network access to Gradle distribution and Google/Maven repositories.
+Requirements: JDK 21 (required by the locked Capacitor 7 plugins), Android SDK 35, Gradle 8.11.1 wrapper, and access to Gradle/Google/Maven repositories. The GitHub Actions workflow installs these automatically.
 
 ```bash
 npm run cap:sync

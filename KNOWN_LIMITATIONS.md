@@ -2,7 +2,8 @@
 
 ## Build / device verification
 
-- **No APK was produced.** The sandbox cannot download the Gradle 8.11.1 distribution (`services.gradle.org` TLS handshake fails) and lacks Google/Maven Android dependencies, `javac`/`jdk.compiler`, `adb`, and an emulator. `npm run build` and `npx cap sync android` pass; `./gradlew assembleDebug` fails before compilation.
+- The local sandbox cannot download Gradle/Android dependencies, so the APK was built successfully on **GitHub Actions** instead. The delivered file is a development/debug APK, not a Play Store release. Its debug signing identity is cached between CI builds on a best-effort basis; it is not a production signing key.
+- The locked Capacitor 7 plugins require **JDK 21** to compile. This supersedes the original JDK 17 build-tool preference; the APK still supports Android API 23+.
 - Native install/launch, SQLite plugin behavior, biometric prompt, SecureStorage, camera, local notification scheduling, FCM push, and OAuth Custom Tab flow were **not** verified on a device/emulator.
 - The browser preview uses SQL.js/IndexedDB, not native SQLite. Its `security` table is not hardware-backed; native Android uses SecureStorage.
 

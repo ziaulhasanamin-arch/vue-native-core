@@ -28,4 +28,4 @@ Legend: ✅ implemented · 🧪 verified by automated browser/unit test in this 
 | Export | CSV, PDF, JSON backup/restore, reset | ✅ (restore ⚠️) |
 | UI | Glass Forest dark/light, floating dock, safe areas, responsive, bundled fonts | ✅ 🧪 mobile layout/theme |
 | i18n | English/Bangla UI strings, Bangla numerals/currency formatting | ✅ (long-form help/privacy partially English) |
-| Android | Capacitor project, manifest hardening, notification icon, OAuth deep link | ✅ sync passes; APK build blocked |
+| Android | Capacitor project, manifest hardening, notification icon, OAuth deep link, signed debug APK | ✅ native CI build/signature/alignment verified; device launch ⚠️ |
