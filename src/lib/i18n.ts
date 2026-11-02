@@ -91,3 +91,27 @@ Object.assign(bn, {
   'Archived':'আর্কাইভকৃত',
 });
 delete bn['Home '];
+Object.assign(bn, {
+  'A fresh start for your finances':'আপনার অর্থের নতুন শুরু',
+  'Less money stress.':'টাকার দুশ্চিন্তা কম।',
+  'More life.':'জীবন উপভোগ বেশি।',
+  'Made for your everyday.':'আপনার প্রতিদিনের জন্য।',
+  'Every account, in one place':'সব হিসাব, এক জায়গায়',
+  'Offline-first. Private by default.':'অফলাইন-প্রথম। স্বাভাবিকভাবেই গোপনীয়।',
+  'Small steps. Meaningful progress.':'ছোট পদক্ষেপ। অর্থবহ অগ্রগতি।',
+  'No ads. No pressure. Just a clearer picture.':'বিজ্ঞাপন নেই। চাপ নেই। শুধু স্পষ্ট চিত্র।',
+  'A little more familiar. A little more you.':'আরও পরিচিত। আরও আপনার মতো।',
+  'You can add accounts in other currencies later.':'পরে অন্য মুদ্রার হিসাব যোগ করতে পারবেন।',
+  'Your financial story starts here.':'আপনার আর্থিক গল্প এখানে শুরু।',
+  'Let’s set up your money':'চলুন আপনার অর্থ সাজাই',
+  'Three small steps. A clearer picture.':'তিনটি ছোট ধাপ। আরও স্পষ্ট চিত্র।',
+  'Add your first account':'প্রথম হিসাব যোগ করুন',
+  'Record a transaction':'একটি লেনদেন রেকর্ড করুন',
+  'Set a monthly budget':'মাসিক বাজেট নির্ধারণ করুন',
+  'Step 1':'ধাপ ১',
+  'Step 2':'ধাপ ২',
+  'Step 3':'ধাপ ৩',
+  'Opening your private database…':'আপনার ব্যক্তিগত ডাটাবেস খোলা হচ্ছে…',
+  'Opening your private workspace…':'আপনার ব্যক্তিগত কর্মক্ষেত্র খোলা হচ্ছে…',
+  'Your data stays on this device.':'আপনার তথ্য এই ডিভাইসেই থাকে।',
+});

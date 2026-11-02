@@ -56,8 +56,16 @@ async function seed(): Promise<Data> {
 export const useStore = create<Store>((set, get) => ({
   data: null, ready: false, error: '', locked: false, toast: null,
   async initialize() {
-    try { const data = await seed(); set({ data, ready: true, error: '' }); }
-    catch (e) { set({ error: e instanceof Error ? e.message : 'Unable to open your database.', ready: false }); }
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    try {
+      const data = await Promise.race([
+        seed(),
+        new Promise<never>((_, reject) => { timer = setTimeout(() => reject(new Error('Opening the local database timed out. Please try again.')), 20000); }),
+      ]);
+      set({ data, ready: true, error: '' });
+    } catch (e) {
+      set({ error: e instanceof Error && e.message ? e.message : 'Unable to open your database.', ready: false });
+    } finally { if (timer) clearTimeout(timer); }
   },
   async refresh() { set({ data: await loadData() }); },
   notify(text, kind = 'success') {

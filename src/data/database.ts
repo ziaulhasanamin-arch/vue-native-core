@@ -64,20 +64,47 @@ export function createWebAdapter(SQL: SqlJsStatic, bytes?: Uint8Array | null, pe
     export: () => db.export(),
   };
 }
+/**
+ * Android's Capacitor SQLite bridge distinguishes raw SQL (DDL/PRAGMA) from
+ * parameterised statements. `executeSet` is an optimised DML path and requires
+ * a `values` array on every row; feeding schema DDL through it breaks first launch.
+ * Use one explicit native transaction, with the correct bridge method per statement.
+ */
+export function createNativeAdapter(native: SQLiteDBConnection): DatabaseAdapter {
+  let chain: Promise<unknown> = Promise.resolve();
+  const serial = <T>(job: () => Promise<T>): Promise<T> => {
+    const result = chain.catch(() => undefined).then(job);
+    chain = result.then(() => undefined, () => undefined);
+    return result;
+  };
+  return {
+    query: <T>(sql: string, values: (string | number | null)[] = []) => serial(async () => ((await native.query(sql, values)).values ?? []) as T[]),
+    transact: statements => serial(async () => {
+      if (!statements.length) return;
+      await native.beginTransaction();
+      try {
+        for (const item of statements) {
+          if (item.values && item.values.length) await native.run(item.statement, item.values, false, 'no', false);
+          else await native.execute(item.statement, false, false);
+        }
+        await native.commitTransaction();
+      } catch (error) {
+        await native.rollbackTransaction().catch(() => undefined);
+        throw error;
+      }
+    }),
+  };
+}
 async function initialize(): Promise<DatabaseAdapter> {
   let adapter: DatabaseAdapter;
-  let native: SQLiteDBConnection | undefined;
   if (Capacitor.isNativePlatform()) {
     const connection = new SQLiteConnection(CapacitorSQLite);
     await connection.checkConnectionsConsistency();
     const exists = (await connection.isConnection(DB_NAME, false)).result;
-    native = exists ? await connection.retrieveConnection(DB_NAME, false) : await connection.createConnection(DB_NAME, false, 'no-encryption', SCHEMA_VERSION, false);
+    const native = exists ? await connection.retrieveConnection(DB_NAME, false) : await connection.createConnection(DB_NAME, false, 'no-encryption', SCHEMA_VERSION, false);
     await native.open();
-    await native.execute('PRAGMA foreign_keys = ON;');
-    adapter = {
-      query: async <T>(sql: string, values: (string | number | null)[] = []) => ((await native!.query(sql, values)).values ?? []) as T[],
-      transact: async statements => { if (statements.length) await native!.executeSet(statements, true); },
-    };
+    await native.execute('PRAGMA foreign_keys = ON;', false, false);
+    adapter = createNativeAdapter(native);
   } else {
     const SQL = await initSqlJs({ locateFile: () => wasmUrl });
     adapter = createWebAdapter(SQL, await readBytes());
