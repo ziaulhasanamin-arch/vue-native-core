@@ -7,14 +7,14 @@ Verified using v4 scheme (APK Signature Scheme v4): false
 Verified for SourceStamp: false
 Number of signers: 1
 Signer #1 certificate DN: C=US, O=Android, CN=Android Debug
-Signer #1 certificate SHA-256 digest: 3d2e98cefa83b435b57eae8bccfdaf57fa02f1eb00e03d57eb2699da729bcedb
-Signer #1 certificate SHA-1 digest: d29d9a88ca9bc5e31dc0025e5bf702b1d1faadc6
-Signer #1 certificate MD5 digest: ccd9db1b4c677105c6cbef210ee1a932
+Signer #1 certificate SHA-256 digest: 425c27b9772b9976479a651be6bdabb363de2b38d6df86e318ed431c463085f1
+Signer #1 certificate SHA-1 digest: 9b20480a72bc223708821ef8e16bbd03f1c04769
+Signer #1 certificate MD5 digest: 4454c314dffbe525fdcd03b35fd47f93
 Signer #1 key algorithm: RSA
 Signer #1 key size (bits): 2048
-Signer #1 public key SHA-256 digest: 4d92984f1715c6efd5b11bac94120934533d520f4dafd1c87c42fea86478b927
-Signer #1 public key SHA-1 digest: 13441a87a39d42bcb92489ff1dbe387266fe37b6
-Signer #1 public key MD5 digest: a238643ee2e8038e941611596520aed7
+Signer #1 public key SHA-256 digest: 1be052d2ba719997edb29714471f68eab973cb8df79efaa4a530d93c27c3c92a
+Signer #1 public key SHA-1 digest: 90ea11f2b662b618bbba0d51b57dc8746ae14a9b
+Signer #1 public key MD5 digest: d2a602cadea1865c993f438a9850f61d
 WARNING: META-INF/com/android/build/gradle/app-metadata.properties not protected by signature. Unauthorized modifications to this JAR entry will not be detected. Delete or move the entry outside of META-INF/.
 WARNING: META-INF/androidx.activity_activity-ktx.version not protected by signature. Unauthorized modifications to this JAR entry will not be detected. Delete or move the entry outside of META-INF/.
 WARNING: META-INF/androidx.activity_activity.version not protected by signature. Unauthorized modifications to this JAR entry will not be detected. Delete or move the entry outside of META-INF/.

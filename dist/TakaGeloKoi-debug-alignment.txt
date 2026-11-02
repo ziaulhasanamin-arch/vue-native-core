@@ -1115,5 +1115,5 @@ Verifying alignment of dist/TakaGeloKoi-debug.apk (4)...
 31994998 play-services-tasks.properties (OK - compressed)
 31995095 META-INF/CERT.SF (OK - compressed)
 32047192 META-INF/CERT.RSA (OK - compressed)
-32048264 META-INF/MANIFEST.MF (OK - compressed)
+32048259 META-INF/MANIFEST.MF (OK - compressed)
 Verification succesful
